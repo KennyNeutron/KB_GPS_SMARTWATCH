@@ -35,6 +35,10 @@ byte toSET_HH = 0;
 byte toSET_MM = 0;
 byte toSET_SS = 0;
 
+byte toSET_DD=0;
+byte toSET_MO=0;
+int toSET_YYYY=0;
+
 bool century = false;
 bool h12Flag;
 bool pmFlag;
@@ -44,7 +48,7 @@ byte B_time_MM;
 byte B_time_SS;
 
 int I_date_YY;
-byte B_date_MM;
+byte B_date_MO;
 byte B_date_DD;
 
 
@@ -126,6 +130,9 @@ void loop() {
     myRTC.setHour(toSET_HH);
     myRTC.setMinute(toSET_MM);
     myRTC.setSecond(toSET_SS);
+    myRTC.setMonth(toSET_MO);
+    myRTC.setDate(toSET_DD);
+    myRTC.setYear(toSET_YYYY);
     toggle_SAVESET=false;
   }
 

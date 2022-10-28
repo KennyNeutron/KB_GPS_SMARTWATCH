@@ -1,7 +1,7 @@
 void drawClock() {
 
   char current_time[9] = " ";
-  char current_date[11] = "01-01-2000";
+  char current_date[11] = " ";
 
 
 
@@ -23,7 +23,26 @@ void drawClock() {
     sprintf(current_time, "%d:%d:%d", B_time_HH, B_time_MM, B_time_SS);
   }
 
+  if (B_date_MO < 10 && B_date_DD < 10 && I_date_YY < 10) {
+    sprintf(current_date, "0%d-0%d-200%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO < 10 && B_date_DD < 10 && I_date_YY >= 10) {
+    sprintf(current_date, "0%d-0%d-20%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO < 10 && B_date_DD >= 10 && I_date_YY < 10) {
+    sprintf(current_date, "0%d-%d-200%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO < 10 && B_date_DD >= 10 && I_date_YY >= 10) {
+    sprintf(current_date, "0%d-%d-20%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO >= 10 && B_date_DD < 10 && I_date_YY < 10) {
+    sprintf(current_date, "%d-0%d-200%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO >= 10 && B_date_DD < 10 && I_date_YY >= 10) {
+    sprintf(current_date, "%d-0%d-20%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO >= 10 && B_date_DD >= 10 && I_date_YY < 10) {
+    sprintf(current_date, "%d-%d-200%i", B_date_MO, B_date_DD, I_date_YY);
+  } else if (B_date_MO >= 10 && B_date_DD >= 10 && I_date_YY >= 10) {
+    sprintf(current_date, "%d-%d-20%i", B_date_MO, B_date_DD, I_date_YY);
+  }
 
+
+  
 
 
   u8g.setFont(u8g_font_courB18r);
@@ -35,7 +54,7 @@ void drawClock() {
 
 
   //############# test ######################
-
+  /*
   char btnstatus[3];
   int bU = 0;
   int bD = 0;
@@ -60,6 +79,7 @@ void drawClock() {
   }
 
   u8g.drawStr(60, 11, btnstatus);
+  */
   //###########################################
 }
 
@@ -71,9 +91,13 @@ void setClock() {
     toSET_HH = myRTC.getHour(h12Flag, pmFlag);
     toSET_MM = myRTC.getMinute();
     toSET_SS = myRTC.getSecond();
+
+    toSET_DD = myRTC.getDate();
+    toSET_MO = myRTC.getMonth(century);
+    toSET_YYYY = myRTC.getYear();
   }
   char TOSET_time[9] = " ";
-  char TOSET_date[11] = "01-01-2000";
+  char TOSET_date[11] = " ";
 
   if (toSET_HH < 10 && toSET_MM < 10 && toSET_SS < 10) {
     sprintf(TOSET_time, "0%d:0%d:0%d", toSET_HH, toSET_MM, toSET_SS);
@@ -91,6 +115,24 @@ void setClock() {
     sprintf(TOSET_time, "%d:%d:0%d", toSET_HH, toSET_MM, toSET_SS);
   } else if (toSET_HH >= 10 && toSET_MM >= 10 && toSET_SS >= 10) {
     sprintf(TOSET_time, "%d:%d:%d", toSET_HH, toSET_MM, toSET_SS);
+  }
+
+  if (toSET_MO < 10 && toSET_DD < 10 && toSET_YYYY < 10) {
+    sprintf(TOSET_date, "0%d-0%d-200%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO < 10 && toSET_DD < 10 && toSET_YYYY >= 10) {
+    sprintf(TOSET_date, "0%d-0%d-20%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO < 10 && toSET_DD >= 10 && toSET_YYYY < 10) {
+    sprintf(TOSET_date, "0%d-%d-200%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO < 10 && toSET_DD >= 10 && toSET_YYYY >= 10) {
+    sprintf(TOSET_date, "0%d-%d-20%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO >= 10 && toSET_DD < 10 && toSET_YYYY < 10) {
+    sprintf(TOSET_date, "%d-0%d-200%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO >= 10 && toSET_DD < 10 && toSET_YYYY >= 10) {
+    sprintf(TOSET_date, "%d-0%d-20%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO >= 10 && toSET_DD >= 10 && toSET_YYYY < 10) {
+    sprintf(TOSET_date, "%d-%d-200%i", toSET_MO, toSET_DD, toSET_YYYY);
+  } else if (toSET_MO >= 10 && toSET_DD >= 10 && toSET_YYYY >= 10) {
+    sprintf(TOSET_date, "%d-%d-20%i", toSET_MO, toSET_DD, toSET_YYYY);
   }
 
   u8g.setFont(u8g_font_courB18r);
@@ -117,11 +159,11 @@ void setClock() {
       break;
     case 4:
       u8g.drawStr(15, 62, "--");
-      u8g.drawStr(50, 11, "DATE");
+      u8g.drawStr(50, 11, "MONTH");
       break;
     case 5:
       u8g.drawStr(45, 62, "--");
-      u8g.drawStr(50, 11, "MONTH");
+      u8g.drawStr(50, 11, "DATE");
       break;
     case 6:
       u8g.drawStr(75, 62, "----");

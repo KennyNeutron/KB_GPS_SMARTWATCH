@@ -9,7 +9,7 @@ void button_conditions() {
     } else if (btn_cnt >= 2000 && SETClock) {
       SETClock = false;
       toggle_setClock = true;
-      toggle_SAVESET=true;
+      toggle_SAVESET = true;
     }
   } else {
     btn_cnt = 0;
@@ -41,19 +41,40 @@ void button_conditions() {
       case 3:
         toSET_SS++;
         break;
+      case 4:
+        toSET_MO++;
+        break;
+      case 5:
+        toSET_DD++;
+        break;
+      case 6:
+        toSET_YYYY++;
+        break;
     }
-    toggle_SETVAR=true;
+    toggle_SETVAR = true;
   }
 
 
-  if(toSET_HH>=24){
-    toSET_HH=0;
+  if (toSET_HH >= 24) {
+    toSET_HH = 0;
   }
-  if(toSET_MM>=60){
-    toSET_MM=0;
+  if (toSET_MM >= 60) {
+    toSET_MM = 0;
   }
-  if(toSET_SS>=60){
-    toSET_SS=0;
+  if (toSET_SS >= 60) {
+    toSET_SS = 0;
+  }
+
+  if (toSET_MO > 12) {
+    toSET_MO = 1;
+  }
+
+  if (toSET_DD > 31) {
+    toSET_DD = 1;
+  }
+
+  if (toSET_YYYY >= 100) {
+    toSET_YYYY = 0;
   }
 
   if (!toggle_btnUP) {
