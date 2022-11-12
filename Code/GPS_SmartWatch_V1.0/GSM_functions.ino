@@ -1,11 +1,11 @@
 void SendMessage() {
-  Serial.println ("Sending Message");
+  Serial.println("Sending Message");
   sim.println("AT+CMGF=1");  //Sets the GSM Module in Text Mode
   delay(200);
-  Serial.println ("Set SMS Number");
+  Serial.println("Set SMS Number");
   sim.println("AT+CMGS=\"" + emg_number + "\"\r");  //Mobile phone number to send message
   delay(200);
-  String SMS = "I have an emergency... my current location is... ";
+  String SMS = "I have an emergency... my current location is... https://maps.google.com/?q=" + gps_lat + "," + gps_lon;
   Serial.print("Sending");
   sim.println(SMS);
   delay(100);
@@ -20,6 +20,7 @@ void SendMessage() {
 
   Serial.print(".");
   Serial.println("MESSAGE SENT");
+  wdt_reset();
 }
 
 String _readSerial() {

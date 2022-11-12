@@ -2,12 +2,25 @@
 #include "U8glib.h"
 #include <DS3231.h>
 #include <Wire.h>
+#include <TinyGPSPlus.h>
+
 
 #include <SoftwareSerial.h>
 SoftwareSerial sim(2, 3);
 int _timeout;
 String _buffer;
 String emg_number = "+639286707466";  //-> change with your number
+
+static const int RXPin = 5, TXPin = 4;
+static const uint32_t GPSBaud = 9600;
+
+// The TinyGPSPlus object
+TinyGPSPlus gps;
+
+// The serial connection to the GPS device
+SoftwareSerial ss(RXPin, TXPin);
+
+
 
 
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
@@ -52,6 +65,9 @@ byte B_time_SS;
 int I_date_YY;
 byte B_date_MO;
 byte B_date_DD;
+
+String gps_lat=" ";
+String gps_lon=" ";
 
 
 void setup() {
@@ -104,6 +120,11 @@ void setup() {
   //  TIMSK0 |= (1 << OCIE0A);
   //  sei();  //allow interrupts
   //#############################################################
+
+
+  //GPS
+  ss.begin(GPSBaud);
+  Serial.println(TinyGPSPlus::libraryVersion());
 }
 
 //timer0 interrupt 2kHz
@@ -155,9 +176,9 @@ void isr_tmr() {
 
 
 void loop() {
-  if (!SETEmg) {
-  wdt_reset();
-  }
+ // if (!SETEmg) {
+    wdt_reset();
+ // }
   isr_tmr();
   if (toggle_SAVESET) {
     myRTC.setHour(toSET_HH);
@@ -181,6 +202,10 @@ void loop() {
 
   */
 
+
+  gps_loop();
+
+
   u8g.firstPage();
   do {
     if (!SETClock) {
@@ -201,6 +226,4 @@ void loop() {
     }
     getTime();
   } while (u8g.nextPage());
-
-
 }
