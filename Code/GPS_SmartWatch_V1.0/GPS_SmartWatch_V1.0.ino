@@ -1,43 +1,45 @@
 #include <avr/wdt.h>
-#include <SoftwareSerial.h>
-#include "Gpsneo.h"
 #include "U8glib.h"
 #include <DS3231.h>
 #include <Wire.h>
 
+#include <SoftwareSerial.h>
+SoftwareSerial sim(2, 3);
+int _timeout;
+String _buffer;
+String emg_number = "+639286707466";  //-> change with your number
+
 
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
-//Gpsneo gps;
-Gpsneo gps(10, 11);
 
-char latitud[11];
-char latitudHemisphere[3];
-char longitud[11];
-char longitudMeridiano[3];
 
-char link[70];
 
-#define btn_up 4
-#define btn_dn 5
+
+#define btn_up 7
+#define btn_dn 6
 
 
 bool SETClock = false;
+bool SETNum = false;
+bool SETEmg = false;
+
+bool EMGmsg_sent = false;
 
 DS3231 myRTC;
 
-byte TOSET=0;
+byte TOSET = 0;
 
-bool toggle_TOSET=false;
-bool toggle_SETVAR=false;
-bool toggle_SAVESET=false;
+bool toggle_TOSET = false;
+bool toggle_SETVAR = false;
+bool toggle_SAVESET = false;
 
 byte toSET_HH = 0;
 byte toSET_MM = 0;
 byte toSET_SS = 0;
 
-byte toSET_DD=0;
-byte toSET_MO=0;
-int toSET_YYYY=0;
+byte toSET_DD = 0;
+byte toSET_MO = 0;
+int toSET_YYYY = 0;
 
 bool century = false;
 bool h12Flag;
@@ -53,11 +55,20 @@ byte B_date_DD;
 
 
 void setup() {
+
+
   pinMode(btn_up, INPUT_PULLUP);
   pinMode(btn_dn, INPUT_PULLUP);
 
+
   Serial.begin(9600);
   Serial.println("START");
+
+  _buffer.reserve(50);
+  Serial.println("System Started...");
+  sim.begin(9600);
+
+  delay(1000);
 
   //##################### OLED DISPLAY #####################
   // flip screen, if required
@@ -78,94 +89,118 @@ void setup() {
   //################################
 
   //############# interrupt timer ##########################
-  cli();       //stop interrupts
-               //set timer0 interrupt at 2kHz
-  TCCR0A = 0;  // set entire TCCR2A register to 0
-  TCCR0B = 0;  // same for TCCR2B
-  TCNT0 = 0;   //initialize counter value to 0
-  // set compare match register for 2khz increments
-  OCR0A = 124;  // = (16*10^6) / (2000*64) - 1 (must be <256)
-  // turn on CTC mode
-  TCCR0A |= (1 << WGM01);
-  // Set CS01 and CS00 bits for 64 prescaler
-  TCCR0B |= (1 << CS01) | (1 << CS00);
-  // enable timer compare interrupt
-  TIMSK0 |= (1 << OCIE0A);
-  sei();  //allow interrupts
+  //  cli();       //stop interrupts
+  //  //set timer0 interrupt at 2kHz
+  //  TCCR0A = 0;  // set entire TCCR2A register to 0
+  //  TCCR0B = 0;  // same for TCCR2B
+  //  TCNT0 = 0;   //initialize counter value to 0
+  //  // set compare match register for 2khz increments
+  //  OCR0A = 124;  // = (16*10^6) / (2000*64) - 1 (must be <256)
+  //  // turn on CTC mode
+  //  TCCR0A |= (1 << WGM01);
+  //  // Set CS01 and CS00 bits for 64 prescaler
+  //  TCCR0B |= (1 << CS01) | (1 << CS00);
+  //  // enable timer compare interrupt
+  //  TIMSK0 |= (1 << OCIE0A);
+  //  sei();  //allow interrupts
   //#############################################################
 }
 
 //timer0 interrupt 2kHz
 int btn_cnt = 0;
 
+int btn_emg = 0;
+
 bool toggle_btnUP = false;
 bool toggle_btnDN = false;
-bool toggle_setClock=false;
+bool toggle_setClock = false;
+//
+//ISR(TIMER0_COMPA_vect) {
+//  if (!status_btnUP()) {
+//    toggle_btnUP = true;
+//  } else {
+//    toggle_btnUP = false;
+//    toggle_setClock = false;
+//  }
+//
+//  if (!status_btnDN()) {
+//    toggle_btnDN = true;
+//  } else {
+//    toggle_btnDN = false;
+//    toggle_setClock = false;
+//  }
+//
+//  button_conditions();
+//
+//}
 
-ISR(TIMER0_COMPA_vect) {
+void isr_tmr() {
   if (!status_btnUP()) {
     toggle_btnUP = true;
   } else {
     toggle_btnUP = false;
-    toggle_setClock=false;
+    toggle_setClock = false;
   }
 
-  if(!status_btnDN()){
-    toggle_btnDN=true;
-  }else{
-    toggle_btnDN=false;
-    toggle_setClock=false;
+  if (!status_btnDN()) {
+    toggle_btnDN = true;
+  } else {
+    toggle_btnDN = false;
+    toggle_setClock = false;
   }
 
   button_conditions();
-
 }
 
 
 
 void loop() {
+  if (!SETEmg) {
   wdt_reset();
-
-  if(toggle_SAVESET){
+  }
+  isr_tmr();
+  if (toggle_SAVESET) {
     myRTC.setHour(toSET_HH);
     myRTC.setMinute(toSET_MM);
     myRTC.setSecond(toSET_SS);
     myRTC.setMonth(toSET_MO);
     myRTC.setDate(toSET_DD);
     myRTC.setYear(toSET_YYYY);
-    toggle_SAVESET=false;
+    toggle_SAVESET = false;
   }
 
   /*
-  Serial.println(latitud);
-  Serial.println(latitudHemisphere);
-  Serial.println(longitud);
-  Serial.println(longitudMeridiano);
+    Serial.println(latitud);
+    Serial.println(latitudHemisphere);
+    Serial.println(longitud);
+    Serial.println(longitudMeridiano);
 
 
 
-  Serial.println(link);
+    Serial.println(link);
 
-*/
+  */
 
   u8g.firstPage();
   do {
     if (!SETClock) {
-      drawClock();
+      if (SETEmg) {
+        displayEmg();
+        Serial.println("EMG");
+        if (!EMGmsg_sent) {
+          Serial.println("EMG!!!!");
+          SendMessage();
+          EMGmsg_sent = true;
+        }
+
+      } else {
+        drawClock();
+      }
     } else {
       setClock();
     }
     getTime();
   } while (u8g.nextPage());
-}
 
 
-void getGPS() {
-  /*
-  gps.getDataGPRMC(latitud,
-                   latitudHemisphere,
-                   longitud,
-                   longitudMeridiano);
-                   */
-  gps.Google(link);
 }

@@ -42,7 +42,7 @@ void drawClock() {
   }
 
 
-  
+
 
 
   u8g.setFont(u8g_font_courB18r);
@@ -55,30 +55,30 @@ void drawClock() {
 
   //############# test ######################
   /*
-  char btnstatus[3];
-  int bU = 0;
-  int bD = 0;
+    char btnstatus[3];
+    int bU = 0;
+    int bD = 0;
 
-  if (status_btnUP()) {
+    if (status_btnUP()) {
     bU = 1;
-  } else {
+    } else {
     bU = 0;
-  }
+    }
 
-  if (status_btnDN()) {
+    if (status_btnDN()) {
     bD = 1;
-  } else {
+    } else {
     bD = 0;
-  }
+    }
 
-  int istatus = (bU * 10) + bD;
-  if (istatus < 10) {
+    int istatus = (bU * 10) + bD;
+    if (istatus < 10) {
     sprintf(btnstatus, "0%d", istatus);
-  } else {
+    } else {
     sprintf(btnstatus, "%d", istatus);
-  }
+    }
 
-  u8g.drawStr(60, 11, btnstatus);
+    u8g.drawStr(60, 11, btnstatus);
   */
   //###########################################
 }
@@ -185,7 +185,17 @@ void setClock() {
 
   //############# test ######################
   /*char ch_toset[2];
-  sprintf(ch_toset, "%d", TOSET);
-  u8g.drawStr(45, 11, ch_toset);*/
+    sprintf(ch_toset, "%d", TOSET);
+    u8g.drawStr(45, 11, ch_toset);*/
   //###########################################
+}
+
+
+
+void displayEmg() {
+
+  u8g.setFont(u8g_font_courR12r);
+
+  u8g.drawStr(5, 30, "S.O.S.");
+  u8g.drawStr(5, 45, "MESSAGE SENT!");
 }
