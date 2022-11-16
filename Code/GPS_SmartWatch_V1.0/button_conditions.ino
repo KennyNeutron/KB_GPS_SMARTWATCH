@@ -1,12 +1,12 @@
 void button_conditions() {
 
-  if(!status_btnUP() && !status_btnDN() && !SETClock && !SETNum && !SETEmg){
+  if (!status_btnUP() && !status_btnDN() && !SETClock && !SETNum && !SETEmg) {
     btn_emg++;
-    if(btn_emg==40){
-      SETEmg=true;
+    if (btn_emg == 40) {
+      SETEmg = true;
     }
-  }else{
-    btn_emg=0;
+  } else {
+    btn_emg = 0;
   }
 
   if (status_btnUP() && !status_btnDN() && !toggle_setClock) {

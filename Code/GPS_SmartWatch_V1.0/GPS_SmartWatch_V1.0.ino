@@ -69,10 +69,11 @@ byte B_date_DD;
 String gps_lat = " ";
 String gps_lon = " ";
 
-uint32_t last_millis=0;
+uint32_t last_millis = 0;
+
+bool valid_location = false;
 
 void setup() {
-
 
   pinMode(btn_up, INPUT);
   pinMode(btn_dn, INPUT);
@@ -123,9 +124,10 @@ void setup() {
   //#############################################################
 
 
+
   //GPS
   ss.begin(GPSBaud);
-  Serial.println(TinyGPSPlus::libraryVersion());
+  //Serial.println(TinyGPSPlus::libraryVersion());
 }
 
 //timer0 interrupt 2kHz
@@ -176,10 +178,14 @@ void isr_tmr() {
 
 
 
+
 void loop() {
-//  if (!SETEmg) {
-//    wdt_reset();
-//  }
+  //  if (!SETEmg) {
+  //    wdt_reset();
+  //  }
+
+
+
   isr_tmr();
   if (toggle_SAVESET) {
     myRTC.setHour(toSET_HH);
@@ -223,19 +229,19 @@ void loop() {
 
 
   if (SETEmg) {
-    Serial.println("EMG");
+    //Serial.println("EMG");
     if (!EMGmsg_sent) {
-      Serial.println("EMG!!!!");
+      //Serial.println("EMG!!!!");
       SendMessage();
-      EMGmsg_sent=true;
-      last_millis=millis();
+      EMGmsg_sent = true;
+      last_millis = millis();
     }
 
-    if(millis()-last_millis>=5000){
-      SETEmg=false;
-      EMGmsg_sent=false;
+    if (millis() - last_millis >= 5000) {
+      SETEmg = false;
+      EMGmsg_sent = false;
     }
   }
 
-   
+
 }

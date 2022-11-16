@@ -1,25 +1,32 @@
 void SendMessage() {
-  Serial.println("Sending Message");
+  //Serial.println("Sending Message");
   sim.println("AT+CMGF=1");  //Sets the GSM Module in Text Mode
   delay(200);
-  Serial.println("Set SMS Number");
+  //Serial.println("Set SMS Number");
   sim.println("AT+CMGS=\"" + emg_number + "\"\r");  //Mobile phone number to send message
   delay(200);
-  String SMS = "I have an emergency... my current location is... https://maps.google.com/?q=" + gps_lat + "," + gps_lon;
-  Serial.print("Sending");
+  String SMS = " ";
+  if (valid_location) {
+    SMS = "I have an emergency... my current location is... https://maps.google.com/?q=" + gps_lat + "," + gps_lon;
+  } else {
+    SMS = "I have an emergency... my current location is... INVALID";
+  }
+  //Serial.print("Sending");
   sim.println(SMS);
   delay(100);
-  Serial.print(".");
+  //Serial.print(".");
   sim.println((char)26);  // ASCII code of CTRL+Z
 
-  Serial.print(".");
+  //Serial.print(".");
   delay(200);
 
-  Serial.print(".");
+  //Serial.print(".");
   //_buffer = _readSerial();
 
-  Serial.print(".");
-  Serial.println("MESSAGE SENT");
+  //Serial.print(".");
+  //Serial.println("MESSAGE SENT");
+
+
 }
 
 String _readSerial() {

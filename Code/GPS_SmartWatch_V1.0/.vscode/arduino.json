@@ -1,0 +1,7 @@
+{
+    "configuration": "cpu=16MHzatmega328",
+    "board": "arduino:avr:pro",
+    "programmer": "arduino:avrispmkii",
+    "port": "COM9",
+    "sketch": "GPS_SmartWatch_V1.0.ino"
+}
