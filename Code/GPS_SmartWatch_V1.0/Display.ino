@@ -52,6 +52,10 @@ void drawClock() {
   u8g.setFont(u8g_font_courR12r);
   u8g.drawStr(15, 55, current_date);
 
+  if (gps.location.isValid()) {
+    u8g.setFont(u8g_font_courR12r);
+    u8g.drawStr(120, 11, "*");
+  }
 
   //############# test ######################
   /*

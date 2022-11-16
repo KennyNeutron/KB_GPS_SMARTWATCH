@@ -16,11 +16,10 @@ void SendMessage() {
   delay(200);
 
   Serial.print(".");
-  _buffer = _readSerial();
+  //_buffer = _readSerial();
 
   Serial.print(".");
   Serial.println("MESSAGE SENT");
-  wdt_reset();
 }
 
 String _readSerial() {

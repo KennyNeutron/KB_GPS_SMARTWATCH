@@ -1,8 +1,8 @@
 void button_conditions() {
 
-  if(!status_btnUP() && status_btnDN && !SETClock && !SETNum && !SETEmg){
+  if(!status_btnUP() && !status_btnDN() && !SETClock && !SETNum && !SETEmg){
     btn_emg++;
-    if(btn_emg==60){
+    if(btn_emg==40){
       SETEmg=true;
     }
   }else{
@@ -11,11 +11,11 @@ void button_conditions() {
 
   if (status_btnUP() && !status_btnDN() && !toggle_setClock) {
     btn_cnt++;
-    if (btn_cnt == 30 && !SETClock) {
+    if (btn_cnt == 10 && !SETClock) {
       SETClock = true;
       toggle_setClock = true;
       TOSET = 0;
-    } else if (btn_cnt == 30 && SETClock) {
+    } else if (btn_cnt == 10 && SETClock) {
       SETClock = false;
       toggle_setClock = true;
       toggle_SAVESET = true;

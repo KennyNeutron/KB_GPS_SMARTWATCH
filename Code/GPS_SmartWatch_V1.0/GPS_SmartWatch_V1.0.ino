@@ -11,7 +11,7 @@ int _timeout;
 String _buffer;
 String emg_number = "+639286707466";  //-> change with your number
 
-static const int RXPin = 5, TXPin = 4;
+static const int RXPin = 4, TXPin = 5;
 static const uint32_t GPSBaud = 9600;
 
 // The TinyGPSPlus object
@@ -66,15 +66,16 @@ int I_date_YY;
 byte B_date_MO;
 byte B_date_DD;
 
-String gps_lat=" ";
-String gps_lon=" ";
+String gps_lat = " ";
+String gps_lon = " ";
 
+uint32_t last_millis=0;
 
 void setup() {
 
 
-  pinMode(btn_up, INPUT_PULLUP);
-  pinMode(btn_dn, INPUT_PULLUP);
+  pinMode(btn_up, INPUT);
+  pinMode(btn_dn, INPUT);
 
 
   Serial.begin(9600);
@@ -101,7 +102,7 @@ void setup() {
   //########################################################
 
   //###### Watchdog Timer ##########
-  wdt_enable(WDTO_8S);
+  //wdt_enable(WDTO_8S);
   //################################
 
   //############# interrupt timer ##########################
@@ -176,9 +177,9 @@ void isr_tmr() {
 
 
 void loop() {
- // if (!SETEmg) {
-    wdt_reset();
- // }
+//  if (!SETEmg) {
+//    wdt_reset();
+//  }
   isr_tmr();
   if (toggle_SAVESET) {
     myRTC.setHour(toSET_HH);
@@ -211,13 +212,6 @@ void loop() {
     if (!SETClock) {
       if (SETEmg) {
         displayEmg();
-        Serial.println("EMG");
-        if (!EMGmsg_sent) {
-          Serial.println("EMG!!!!");
-          SendMessage();
-          EMGmsg_sent = true;
-        }
-
       } else {
         drawClock();
       }
@@ -226,4 +220,22 @@ void loop() {
     }
     getTime();
   } while (u8g.nextPage());
+
+
+  if (SETEmg) {
+    Serial.println("EMG");
+    if (!EMGmsg_sent) {
+      Serial.println("EMG!!!!");
+      SendMessage();
+      EMGmsg_sent=true;
+      last_millis=millis();
+    }
+
+    if(millis()-last_millis>=5000){
+      SETEmg=false;
+      EMGmsg_sent=false;
+    }
+  }
+
+   
 }
