@@ -9,7 +9,9 @@
 SoftwareSerial sim(2, 3);
 int _timeout;
 String _buffer;
-String emg_number = "+639286707466";  //-> change with your number
+String emg_number = "+639639471287";  //-> change with your number
+//String emg_number = "+639286707466";  //-> change with your number
+
 
 static const int RXPin = 4, TXPin = 5;
 static const uint32_t GPSBaud = 9600;
@@ -73,17 +75,22 @@ uint32_t last_millis = 0;
 
 bool valid_location = false;
 
+uint32_t lastMILLIS;
+uint32_t rrport = random(180, 250);
+
+bool GPavail=false;
+
 void setup() {
 
   pinMode(btn_up, INPUT);
   pinMode(btn_dn, INPUT);
 
 
-  Serial.begin(9600);
-  Serial.println("START");
+  //Serial.begin(9600);
+  //Serial.println("START");
 
   _buffer.reserve(50);
-  Serial.println("System Started...");
+  //Serial.println("System Started...");
   sim.begin(9600);
 
   delay(1000);
@@ -128,6 +135,10 @@ void setup() {
   //GPS
   ss.begin(GPSBaud);
   //Serial.println(TinyGPSPlus::libraryVersion());
+
+  rrport = rrport * 1000;
+  lastMILLIS = millis();
+
 }
 
 //timer0 interrupt 2kHz
@@ -241,6 +252,10 @@ void loop() {
       SETEmg = false;
       EMGmsg_sent = false;
     }
+  }
+
+  if((millis()-lastMILLIS)>rrport){
+    GPavail=true;
   }
 
 
